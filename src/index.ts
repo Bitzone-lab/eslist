@@ -1,16 +1,28 @@
 import api from './api'
 import help from './help'
 import process from './process'
-import { Collection } from './utils/manufacturer_collection'
+import { Store, State } from './utils/manufacturer_collection'
 
-export type State = 'default' | 'deleted' | 'updated' | 'added' | 'setted'
+export interface Listore<T, K = undefined> {
+    add: (data: T, pending?: boolean, helper?: K | undefined) => T & { id: string }
+    set: (id: string | number, data: T, helper?: K | undefined) => boolean
+    update: (id: string | number, data: T, pending?: boolean) => boolean
+    delete: (id: string | number, pending?: boolean) => boolean
+    list: () => Array<T & { id: string }>
+    get: (id: string | number) => (T & { id: string }) | null
+    each: <L>(callbackfn: (data: T & { id: string }, helper: K | null, index: number) => L) => L[]
+    init: (list?: T[], helper?: K | undefined) => void
+    mapping: <L>(callbackfn: (data: T, state: State) => L) => L[]
+    portal: (list: T[], helper?: K | undefined) => void
+    confirm: (id: string | number) => boolean
+    cancel: (id: string | number) => boolean
+    helper: (id: string | number, content_helper?: K | undefined) => K | null
+}
 
-export type Store<T, K> = Map<string, Collection<T, K>>
-
-function Listore<T, K = undefined>(
+function listore<T, K = undefined>(
     collections: Array<T> = [],
     custom_helper: K | undefined = undefined
-) {
+): Listore<T, K> {
     const store: Store<T, K> = new Map()
     const { init, mapping, portal, confirm, cancel } = process(store)
 
@@ -36,4 +48,4 @@ function Listore<T, K = undefined>(
     }
 }
 
-export default Listore
+export default listore

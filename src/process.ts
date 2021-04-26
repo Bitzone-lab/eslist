@@ -1,4 +1,4 @@
-import { State, Store } from '.'
+import { State, Store } from './utils/manufacturer_collection'
 import extract_id_data from './utils/extract_id_data'
 import { init_collection } from './utils/manufacturer_collection'
 

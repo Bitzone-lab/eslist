@@ -1,4 +1,4 @@
-import { Store } from '.'
+import { Store } from './utils/manufacturer_collection'
 
 export default function help<T, K>(store: Store<T, K>) {
     function helper(id: string | number, content_helper?: K): K | null {

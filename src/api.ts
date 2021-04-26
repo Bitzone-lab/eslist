@@ -1,4 +1,4 @@
-import { Store } from '.'
+import { Store } from './utils/manufacturer_collection'
 import createHash from './utils/create_hash'
 import { init_collection } from './utils/manufacturer_collection'
 

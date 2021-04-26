@@ -1,6 +1,8 @@
-import { State } from '..'
 import { isDataSystem } from './expects'
 import extract_id_data from './extract_id_data'
+
+export type State = 'default' | 'deleted' | 'updated' | 'added' | 'setted'
+export type Store<T, K> = Map<string, Collection<T, K>>
 
 export interface Collection<T, K> {
     id: string
