@@ -1,6 +1,6 @@
 {
   "name": "ts_template",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "description": "",
   "main": "lib/index.js",
   "types": "./types/index.d.ts",
@@ -10,8 +10,7 @@
     "dev": "ts-node ./src/index.ts",
     "watch": "ts-node ./src/index.ts --watch",
     "lint": "eslint . --ext .ts",
-    "build": "tsc --d --declarationDir ./types",
-    "publish:lib": "npm run lint && npm run test && npm run build && npm publish"
+    "build": "npm run lint && npm run test && tsc --d --declarationDir ./types"
   },
   "keywords": [
     "typescript",
