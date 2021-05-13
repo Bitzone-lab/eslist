@@ -32,7 +32,7 @@ const users: Eslist<ListInterface> = eslist(list)
 users() // [{ key, ... }, ...]
 ```
 
-Al inicializar, se le asigna una key única a cada item del listado. Eslist te da la opción de asignar uno propio.
+When initializing, a unique key is assigned to each item in the list. Eslist gives you the option to assign your own. 
 
 ```js
 const users = eslist(list, data => ({
@@ -45,7 +45,7 @@ users() // [{ key: 1, ... }, ...]
 
 ## Helper
 
-Son datos adicionales de ayuda que se aplica a cada item del listado.
+They are additional help data that is applied to each item in the list. 
 
 ```js
 const users = eslist(list, data => ({
@@ -56,9 +56,9 @@ const users = eslist(list, data => ({
 users.helper(key) // { my_helper: 'any' }
 ```
 
-Cualquier tipo de dato es aceptable.
+Any type of data is acceptable.
 
-Cuando se añada un nuevo dato tambien es posible asignar le un helper.
+When adding new data it is also possible to assign it a helper. 
 ```js
 users.set(1, { id: 1, name: 'Juan' }, false, { my_helper: 'other' })
 users.add({ id: 7, name: 'Lucía' }, false, { my_helper: 'other' })
@@ -66,7 +66,7 @@ users.add({ id: 7, name: 'Lucía' }, false, { my_helper: 'other' })
 
 ## API and state
 
-Al inicializar un listado, los datos pueden ser `never` o `added`. Los estados que existen son:
+When initializing a listing, the data can be either `never` or` added`. The states that exist are: 
 
 * never
 * added
@@ -85,13 +85,13 @@ users.delete(key)       // <-- deleted
 users.set(key, data)    // <-- setted
 ```
 
-Si un dato no se le asigna una key al inicializar, pues este tomorá como estado `added`.
+If a data is not assigned a key when initializing, then it will take as state `added`. 
 
 ```js
 const users = eslist(list) // <-- added
 ```
 
-El resultado lo podrás obtener desde un metodo `mapping`. Itera en todos los datos y te devuelve el estado en que se encuentran.
+The result can be obtained from a `mapping` method. Iterates in all the data and returns you the state in which they are.
 
 ```js
 const users_added = eslist.mapping((data, state) => {
@@ -99,43 +99,43 @@ const users_added = eslist.mapping((data, state) => {
 })
 ```
 
-`mapping` funciona como un filtro tambien, puedes indicar le que datos quiere que retorne.
+`mapping` works as a filter too, you can tell it what data you want it to return. 
 
-|Method | Description | Example |
-|---|---| ---- |
-| get | Obtiene un dato por su key | `get(key)` |
-| add | Agrega un nuevo dato al listado | `add(data)` |
-| update | Actualiza un dato por su id | `update(key, data)` |
-| delete | Elimina un dato por su id | `delete(key)` |
-| set | Ingresa un dato con una key personalizada | `set(key, data)` |
-| each | Listado e incluyendo su key para cada item y helper | `each((data, helper, index) => data)` |
+| Method | Description | Example |
+|---|---|------|
+| get | Obtains a data by its key | `get(key)` |
+| add | Add a new data to the list | `add(data)` |
+| update | Update a data by its id | `update(key, data)` |
+| delete | Delete a data by its id  | `delete(key)` |
+| set | Enter a data with a custom key  | `set(key, data)` |
+| each | List including its key for each item and helper | `each((data, helper, index) => data)` |
 
 ## Pending
 
-Los datos pendientes son maneras para volver a su estado anterior si uno se retracta. Con ello podemos tomar la decisión si confirmamos la acción o cancelomos.
+Pending data are ways to revert to your previous state if you retract. With this we can make the decision if we confirm the action or cancel.
 
 ```js
 const users = eslist([{ id: 1, name: 'Luis' }], data => ({
     key: data.id,
     data
 }))
-users.update(1, { name: 'Manuel' }, true) // tenemos que pasar como tercer parametro true
+users.update(1, { name: 'Manuel' }, true) // we have to pass as the third parameter true 
 users.get(1) // { key: '1', id: 1, name: 'Manuel' }
 
-// en caso de desear cancelar
+// in case you want to cancel 
 users.cancel(1)
 users.get(1) // { key: '1', id: 1, name: 'Luis' }
 users.mapping((user, state) => state === 'updated' ? user : undefined).length // 0
 
-// en caso de desear confirmar
+// in case you want to confirm 
 users.confirm(1)
 users.get(1) // { key: '1', id: 1, name: 'Manuel' }
 users.mapping((user, state) => state === 'updated' ? user : undefined).length // 1
 ```
 
-Es aplicable para `add`, `update`, `delete` y `set`
+It is applicable for  `add`, `update`, `delete` and `set`
 
-Un estado pendiente no se refleja en `mapping` mas solo en los demás a menos que se confirme.
+A pending state is not reflected in `mapping` but only in the others unless it is confirmed.
 
 ```js
 const users = eslist()
@@ -144,7 +144,7 @@ users().length // [{ key, name: 'Ana' }]
 users.mapping((user, state) => state === 'added' ? user : undefined).length // 0
 ```
 
-Cuando se realiza una actualización pendiente, eslist realiza un backup antes de actualizar. Este backup no es mutable y solo existirá hasta que se haya confirmado o cancelado la actualización. Para obtener ese backup se usa el método `frozen(key)`.
+When a pending update is performed, eslist performs a backup before updating. This backup is not mutable and will only exist until the update has been confirmed or canceled. To obtain this backup, the `frozen (key)` method is used.
 
 ```js
 const users = eslist([{ id: 1, name: 'Luis' }], data => ({
@@ -160,7 +160,7 @@ users.frozen(1) // null
 
 ## Portal
 
-Es una manera de reemplazar los datos actuales por un nuevo listado pero evitando perder el estado que se encontraban esos datos.
+It is a way of replacing the current data with a new list but avoiding losing the state of that data. 
 
 ```js
 const users = eslist([ { id: 1, name: 'Liliana' } ])
@@ -169,7 +169,7 @@ users([{ id: 5, name: 'Michael' }])  // [{ key, id: 5, name: 'Michael' }]
 users.mapping((user, state) => state === 'added' ? user : undefined).length // 2
 ```
 
-En un portal tambien se puede configurar su key y helper inicial.
+In a portal you can also configure your key and initial helper.
 
 ```js
 const users = eslist([ { id: 1, name: 'Liliana' } ])
@@ -183,13 +183,13 @@ users([{ id: 5, name: 'Michael' }], user => ({
 
 ## Initial
 
-Si se desea inicializar, podemos usar el método `init`. Este se encargará de limpiar todo. Tambien puedes inicializar con nuevos datos.
+If you want to initialize, you can use the `init` method. This will take care of cleaning everything. You can also initialize with new data. 
 
 ```js
 const users = eslist([ { id: 1, name: 'Liliana' } ])
 users.init()
 
-// con data
+// with data.
 
 users.init([ { id: 9, name: 'manuel' } ], user => ({
     key: user.id,
