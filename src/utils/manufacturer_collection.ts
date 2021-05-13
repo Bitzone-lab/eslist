@@ -1,13 +1,19 @@
+import createHash from './create_hash'
 import { isDataSystem } from './expects'
-import extract_id_data from './extract_id_data'
 
 export type State = 'default' | 'deleted' | 'updated' | 'added' | 'setted'
 export type Store<T, K> = Map<string, Collection<T, K>>
 
+export interface Custom<T, K = undefined> {
+    key?: string | number
+    data: T
+    helper?: K
+}
+
 export interface Collection<T, K> {
-    id: string
+    key: string
     state: State
-    pending: 'deleted' | 'updated' | 'added' | null
+    pending: 'deleted' | 'updated' | 'added' | 'setted' | null
     data: T
     backup: T | null
     system: boolean
@@ -15,12 +21,15 @@ export interface Collection<T, K> {
     helper: K | undefined
 }
 
-export function init_collection<T, K>(data: T, helper: K | undefined): Collection<T, K> {
-    const id = extract_id_data(data)
+export function init_collection<T, K>(
+    data: T,
+    helper?: K | undefined,
+    key?: string | number
+): Collection<T, K> {
     const state: State = 'default'
 
     return {
-        id,
+        key: key !== undefined ? key.toString() : createHash(),
         state,
         pending: null,
         data,

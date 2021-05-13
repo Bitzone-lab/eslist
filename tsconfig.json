@@ -2,7 +2,7 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "module": "commonjs",
-    "noImplicitReturns": true,
+    "noImplicitReturns": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "outDir": "lib",

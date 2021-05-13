@@ -1,51 +1,56 @@
 import api from './api'
 import help from './help'
 import process from './process'
-import { Store, State } from './utils/manufacturer_collection'
-
-export interface Listore<T, K = undefined> {
-    add: (data: T, pending?: boolean, helper?: K | undefined) => T & { id: string }
-    set: (id: string | number, data: T, helper?: K | undefined) => boolean
-    update: (id: string | number, data: T, pending?: boolean) => boolean
-    delete: (id: string | number, pending?: boolean) => boolean
-    list: () => Array<T & { id: string }>
-    get: (id: string | number) => (T & { id: string }) | null
-    each: <L>(callbackfn: (data: T & { id: string }, helper: K | null, index: number) => L) => L[]
-    init: (list?: T[], helper?: K | undefined) => void
+import { Store, State, Custom } from './utils/manufacturer_collection'
+export interface Eslist<T, K = undefined> {
+    (list?: Array<T>, custom?: (item: T) => Custom<T, K>): Array<T & { key: string }>
+    add: (data: T, pending?: boolean, helper?: K | undefined) => T & { key: string }
+    set: (id: string | number, data: T, pending?: boolean, helper?: K | undefined) => boolean
+    update: (key: string | number, data: Partial<T>, pending?: boolean) => boolean
+    delete: (key: string | number, pending?: boolean) => boolean
+    get: (key: string | number, force?: boolean) => (T & { key: string }) | null
+    each: <L>(
+        callbackfn: (data: T & { key: string }, helper: K | null, index: number) => L
+    ) => Array<L>
+    init: (list?: T[], custom?: (item: T) => Custom<T, K>) => void
     mapping: <L>(callbackfn: (data: T, state: State) => L) => L[]
-    portal: (list: T[], helper?: K | undefined) => void
     confirm: (id: string | number) => boolean
     cancel: (id: string | number) => boolean
     helper: (id: string | number, content_helper?: K | undefined) => K | null
+    frozen: (key: string | number) => (T & { key: string }) | null
 }
 
-function listore<T, K = undefined>(
+function eslist<T, K = undefined>(
     collections: Array<T> = [],
-    custom_helper: K | undefined = undefined
-): Listore<T, K> {
+    custom?: (item: T) => Custom<T, K>
+): Eslist<T, K> {
     const store: Store<T, K> = new Map()
     const { init, mapping, portal, confirm, cancel } = process(store)
 
-    init(collections, custom_helper)
+    init(collections, custom)
 
-    const { add, set, update, _delete, list, get, each } = api(store)
-    const { helper } = help(store)
+    const { add, set, update, del, datalist, get, each } = api(store)
+    const { helper: h, frozen } = help(store)
 
-    return {
-        add,
-        set,
-        update,
-        delete: _delete,
-        list,
-        get,
-        each,
-        init,
-        mapping,
-        portal,
-        confirm,
-        cancel,
-        helper
+    function eslist_api(list?: Array<T>, customize?: (item: T) => Custom<T, K>) {
+        list && portal(list, customize)
+        return datalist()
     }
+
+    eslist_api.add = add
+    eslist_api.set = set
+    eslist_api.update = update
+    eslist_api.delete = del
+    eslist_api.get = get
+    eslist_api.each = each
+    eslist_api.init = init
+    eslist_api.mapping = mapping
+    eslist_api.confirm = confirm
+    eslist_api.cancel = cancel
+    eslist_api.helper = h
+    eslist_api.frozen = frozen
+
+    return eslist_api
 }
 
-export default listore
+export default eslist

@@ -1,9 +1,8 @@
-Listore
+Eslist
 =========
 
 Control data list
 
 ```
-npm install listore
+npm install eslist
 ```
-

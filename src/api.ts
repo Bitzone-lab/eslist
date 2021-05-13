@@ -3,46 +3,51 @@ import createHash from './utils/create_hash'
 import { init_collection } from './utils/manufacturer_collection'
 
 export default function api<T, K>(store: Store<T, K>) {
-    function set(id: string | number, data: T, helper?: K): boolean {
-        if (store.has(id + '')) return false
+    function set(id: string | number, data: T, pending: boolean = false, helper?: K): boolean {
+        if (store.has(id.toString())) return false
         const collection = init_collection(data, helper)
-        collection.state = 'setted'
-        store.set(id + '', collection)
+        if (pending) {
+            collection.pending = 'setted'
+        } else {
+            collection.state = 'setted'
+        }
+        store.set(id.toString(), { ...collection, key: id.toString() })
         return true
     }
 
-    function add(
-        data: T,
-        pending: boolean = false,
-        helper: K | undefined = undefined
-    ): T & { id: string } {
-        const id = createHash()
+    function add(data: T, pending: boolean = false, helper?: K): T & { key: string } {
+        const key = createHash()
         const collection = init_collection(data, helper)
         if (pending) {
-            collection.backup = { ...collection.data }
             collection.pending = 'added'
         } else {
             collection.state = 'added'
             collection.backup = null
-            store.set(id, collection)
         }
+
+        store.set(key, collection)
         return {
             ...data,
-            id
+            key
         }
     }
 
-    function get(id: string | number): (T & { id: string }) | null {
-        const collection = store.get(id + '')
-        if (collection) {
-            return { ...collection.data, id: collection.id }
+    function get(key: string | number, force: boolean = false): (T & { key: string }) | null {
+        const collection = store.get(key.toString())
+        if (force) {
+            if (collection) {
+                return { ...collection.data, key: collection.key }
+            }
+        } else if (collection && !collection.hide) {
+            return { ...collection.data, key: collection.key }
         }
+
         return null
     }
 
-    function update(id: string | number, data: T, pending: boolean = false): boolean {
-        const collection = store.get(id + '')
-        if (collection) {
+    function update(key: string | number, data: Partial<T>, pending: boolean = false): boolean {
+        const collection = store.get(key.toString())
+        if (collection && !collection.hide) {
             if (pending) {
                 collection.backup = { ...collection.data }
                 collection.pending = 'updated'
@@ -52,13 +57,14 @@ export default function api<T, K>(store: Store<T, K>) {
                 collection.state = 'updated'
             }
             collection.data = { ...collection.data, ...data }
+            return true
         }
         return false
     }
 
-    function _delete(id: string | number, pending: boolean = false): boolean {
-        const collection = store.get(id + '')
-        if (collection) {
+    function del(key: string | number, pending: boolean = false): boolean {
+        const collection = store.get(key.toString())
+        if (collection && !collection.hide) {
             if (pending) {
                 collection.pending = 'deleted'
                 return true
@@ -68,40 +74,52 @@ export default function api<T, K>(store: Store<T, K>) {
                     collection.state = 'deleted'
                     return true
                 } else {
-                    return store.delete(id + '')
+                    return store.delete(key.toString())
                 }
             }
         }
         return false
     }
 
-    const list = (): Array<T & { id: string }> => {
-        const _list: Array<T & { id: string }> = []
+    const datalist = (): Array<T & { key: string }> => {
+        const list: Array<T & { key: string }> = []
         store.forEach((collection) => {
-            if (!(collection.state === 'deleted' || collection.pending === 'deleted'))
-                _list.push({ ...collection.data, id: collection.id })
+            if (
+                !(
+                    collection.state === 'deleted' ||
+                    collection.pending === 'deleted' ||
+                    collection.hide
+                )
+            )
+                list.push({ ...collection.data, key: collection.key })
         })
-        return _list
+        return list
     }
 
     function each<L>(
-        callbackfn: (data: T & { id: string }, helper: K | null, index: number) => L
+        callbackfn: (data: T & { key: string }, helper: K | null, index: number) => L
     ): Array<L> {
-        const _list: Array<L> = []
+        const list: Array<L> = []
         let count = -1
         store.forEach(function (collection) {
-            if (!(collection.state === 'deleted' || collection.pending === 'deleted')) {
+            if (
+                !(
+                    collection.state === 'deleted' ||
+                    collection.pending === 'deleted' ||
+                    collection.hide
+                )
+            ) {
                 count++
-                _list.push(
+                list.push(
                     callbackfn(
-                        { ...collection.data, id: collection.id },
+                        { ...collection.data, key: collection.key },
                         collection.helper || null,
                         count
                     )
                 )
             }
         })
-        return _list
+        return list
     }
 
     return {
@@ -109,8 +127,8 @@ export default function api<T, K>(store: Store<T, K>) {
         add,
         get,
         update,
-        _delete,
-        list,
+        del,
+        datalist,
         each
     }
 }
