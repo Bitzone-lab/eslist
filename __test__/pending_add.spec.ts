@@ -40,11 +40,11 @@ describe('pending Add', function () {
         )
 
         let users_updated = users.mapping((user, state) => (state === 'added' ? user : undefined))
-        expect(users_updated.length).toBe(0)
+        expect(users_updated.length).toBe(1)
 
         expect(users.confirm(user_created.key)).toBeTruthy()
         users_updated = users.mapping((user, state) => (state === 'added' ? user : undefined))
-        expect(users_updated.length).toBe(1)
+        expect(users_updated.length).toBe(2)
     })
 
     it('cancel', function () {
@@ -57,9 +57,12 @@ describe('pending Add', function () {
             true
         )
 
+        let users_updated = users.mapping((user, state) => (state === 'added' ? user : undefined))
+        expect(users_updated.length).toBe(1)
+
         users.cancel(user_created.key)
         expect(users().length).toBe(1)
-        const users_updated = users.mapping((user, state) => (state === 'added' ? user : undefined))
-        expect(users_updated.length).toBe(0)
+        users_updated = users.mapping((user, state) => (state === 'added' ? user : undefined))
+        expect(users_updated.length).toBe(1)
     })
 })

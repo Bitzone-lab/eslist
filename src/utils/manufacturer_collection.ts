@@ -1,7 +1,6 @@
 import createHash from './create_hash'
-import { isDataSystem } from './expects'
 
-export type State = 'default' | 'deleted' | 'updated' | 'added' | 'setted'
+export type State = 'never' | 'deleted' | 'updated' | 'added' | 'setted'
 export type Store<T, K> = Map<string, Collection<T, K>>
 
 export interface Custom<T, K = undefined> {
@@ -26,15 +25,15 @@ export function init_collection<T, K>(
     helper?: K | undefined,
     key?: string | number
 ): Collection<T, K> {
-    const state: State = 'default'
+    const state: State = key === undefined ? 'added' : 'never'
 
     return {
-        key: key !== undefined ? key.toString() : createHash(),
+        key: key === undefined ? createHash() : key.toString(),
         state,
         pending: null,
         data,
         backup: null,
-        system: isDataSystem(data),
+        system: key !== undefined,
         hide: false,
         helper
     }

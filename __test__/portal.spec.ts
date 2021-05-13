@@ -33,11 +33,9 @@ describe('portal', function () {
         users.add({ id: 2, name: 'Liba' })
         expect(users([{ id: 5, name: 'Liliana' }]).length).toBe(1)
         const users_added = users.mapping((user, state) => (state === 'added' ? user : undefined))
-        const users_default = users.mapping((user, state) =>
-            state === 'default' ? user : undefined
-        )
-        expect(users_added.length).toBe(1)
-        expect(users_default.length).toBe(2)
+        const users_never = users.mapping((user, state) => (state === 'never' ? user : undefined))
+        expect(users_added.length).toBe(2)
+        expect(users_never.length).toBe(1)
     })
 
     it('data with key', function () {
@@ -53,11 +51,9 @@ describe('portal', function () {
             })).length
         ).toBe(1)
         const users_added = users.mapping((user, state) => (state === 'added' ? user : undefined))
-        const users_default = users.mapping((user, state) =>
-            state === 'default' ? user : undefined
-        )
+        const users_never = users.mapping((user, state) => (state === 'never' ? user : undefined))
         expect(users.each((user) => user).length).toBe(1)
         expect(users_added.length).toBe(1)
-        expect(users_default.length).toBe(2)
+        expect(users_never.length).toBe(2)
     })
 })

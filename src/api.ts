@@ -1,6 +1,4 @@
-import { Store } from './utils/manufacturer_collection'
-import createHash from './utils/create_hash'
-import { init_collection } from './utils/manufacturer_collection'
+import { Store, init_collection } from './utils/manufacturer_collection'
 
 export default function api<T, K>(store: Store<T, K>) {
     function set(key: string | number, data: T, pending: boolean = false, helper?: K): boolean {
@@ -16,19 +14,19 @@ export default function api<T, K>(store: Store<T, K>) {
     }
 
     function add(data: T, pending: boolean = false, helper?: K): T & { key: string } {
-        const key = createHash()
         const collection = init_collection(data, helper)
         if (pending) {
             collection.pending = 'added'
+            collection.state = 'never'
         } else {
             collection.state = 'added'
             collection.backup = null
         }
 
-        store.set(key, collection)
+        store.set(collection.key, collection)
         return {
             ...data,
-            key
+            key: collection.key
         }
     }
 

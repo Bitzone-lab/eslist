@@ -1,5 +1,4 @@
-import { Custom, State, Store } from './utils/manufacturer_collection'
-import { init_collection } from './utils/manufacturer_collection'
+import { Custom, State, Store, init_collection } from './utils/manufacturer_collection'
 
 export default function process<T, K>(store: Store<T, K>) {
     function mapping<L>(callbackfn: (data: T, state: State) => L): Array<L> {
