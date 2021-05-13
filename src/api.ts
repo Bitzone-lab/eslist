@@ -3,15 +3,15 @@ import createHash from './utils/create_hash'
 import { init_collection } from './utils/manufacturer_collection'
 
 export default function api<T, K>(store: Store<T, K>) {
-    function set(id: string | number, data: T, pending: boolean = false, helper?: K): boolean {
-        if (store.has(id.toString())) return false
+    function set(key: string | number, data: T, pending: boolean = false, helper?: K): boolean {
+        if (store.has(key.toString())) return false
         const collection = init_collection(data, helper)
         if (pending) {
             collection.pending = 'setted'
         } else {
             collection.state = 'setted'
         }
-        store.set(id.toString(), { ...collection, key: id.toString() })
+        store.set(key.toString(), { ...collection, key: key.toString() })
         return true
     }
 

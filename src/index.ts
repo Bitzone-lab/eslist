@@ -5,7 +5,7 @@ import { Store, State, Custom } from './utils/manufacturer_collection'
 export interface Eslist<T, K = undefined> {
     (list?: Array<T>, custom?: (item: T) => Custom<T, K>): Array<T & { key: string }>
     add: (data: T, pending?: boolean, helper?: K | undefined) => T & { key: string }
-    set: (id: string | number, data: T, pending?: boolean, helper?: K | undefined) => boolean
+    set: (key: string | number, data: T, pending?: boolean, helper?: K | undefined) => boolean
     update: (key: string | number, data: Partial<T>, pending?: boolean) => boolean
     delete: (key: string | number, pending?: boolean) => boolean
     get: (key: string | number, force?: boolean) => (T & { key: string }) | null
@@ -14,9 +14,9 @@ export interface Eslist<T, K = undefined> {
     ) => Array<L>
     init: (list?: T[], custom?: (item: T) => Custom<T, K>) => void
     mapping: <L>(callbackfn: (data: T, state: State) => L) => L[]
-    confirm: (id: string | number) => boolean
-    cancel: (id: string | number) => boolean
-    helper: (id: string | number, content_helper?: K | undefined) => K | null
+    confirm: (key: string | number) => boolean
+    cancel: (key: string | number) => boolean
+    helper: (key: string | number, content_helper?: K | undefined) => K | null
     frozen: (key: string | number) => (T & { key: string }) | null
 }
 
@@ -30,7 +30,7 @@ function eslist<T, K = undefined>(
     init(collections, custom)
 
     const { add, set, update, del, datalist, get, each } = api(store)
-    const { helper: h, frozen } = help(store)
+    const { helper, frozen } = help(store)
 
     function eslist_api(list?: Array<T>, customize?: (item: T) => Custom<T, K>) {
         list && portal(list, customize)
@@ -47,7 +47,7 @@ function eslist<T, K = undefined>(
     eslist_api.mapping = mapping
     eslist_api.confirm = confirm
     eslist_api.cancel = cancel
-    eslist_api.helper = h
+    eslist_api.helper = helper
     eslist_api.frozen = frozen
 
     return eslist_api
