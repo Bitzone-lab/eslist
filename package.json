@@ -1,9 +1,12 @@
 {
   "name": "eslist",
   "version": "1.0.0-beta.1",
-  "description": "",
+  "description": "Control data list",
   "main": "lib/index.js",
   "types": "./types/index.d.ts",
+  "bugs": "https://github.com/Bitzone-lab/eslist/issues",
+  "repository": "https://github.com/Bitzone-lab/eslist",
+  "homepage": "https://github.com/Bitzone-lab",
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
@@ -14,7 +17,16 @@
   },
   "keywords": [
     "typescript",
-    "javascript"
+    "javascript",
+    "store",
+    "list",
+    "states"
+  ],
+  "files": [
+    "lib",
+    "types",
+    "Readme.md",
+    "LICENSE"
   ],
   "author": "Erick <ertriilive@gmail.com> (https://github.com/ertrii)",
   "license": "MIT",
